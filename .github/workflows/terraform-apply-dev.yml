@@ -5,13 +5,13 @@ on:
     branches: [ "main" ]
     paths:
       - "terraform/**"
-
 jobs:
   apply-dev:
     runs-on: ubuntu-latest
-
     environment: aws-dev
-
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
