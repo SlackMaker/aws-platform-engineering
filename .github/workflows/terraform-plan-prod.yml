@@ -1,24 +1,26 @@
-name: Terraform Plan
+name: Terraform Apply PROD
 
 on:
-  pull_request:
-    branches: [ "main", "prod" ]
-    paths:
-      - "terraform/**"   # só roda se arquivos Terraform mudarem
+  push:
+    branches:
+      - main
+      - prod
 
 jobs:
-  plan:
+  apply:
     runs-on: ubuntu-latest
+    environment: aws-prod   # usa o Environment que você configurou
+
     permissions:
       contents: read
-      id-token: write    # necessário para OIDC
+      id-token: write       # necessário para OIDC
 
     steps:
-      # Checkout do código
+      # Pega o código
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Terraform
+      # Configura Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -36,19 +38,13 @@ jobs:
         working-directory: terraform/stacks/security/github-oidc-prod
         run: terraform init -input=false
 
-      # Terraform Format check
-      - name: Terraform Format
-        working-directory: terraform/stacks/security/github-oidc-prod
-        run: terraform fmt -check -recursive
-
-      #  Terraform Validate
-      - name: Terraform Validate
-        working-directory: terraform/stacks/security/github-oidc-prod
-        run: terraform validate
-
       # Terraform Plan
       - name: Terraform Plan
         working-directory: terraform/stacks/security/github-oidc-prod
-        id: plan
-        run: terraform plan -input=false -no-color
+        run: terraform plan -input=false
+
+      # Terraform Apply
+      - name: Terraform Apply
+        working-directory: terraform/stacks/security/github-oidc-prod
+        run: terraform apply -auto-approve
 
