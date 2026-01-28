@@ -25,8 +25,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - run: terraform init -input=false
+      - run: terraform init -reconfigure -input=false
         working-directory: terraform/stacks/security/github-oidc-prod
 
       - run: terraform apply -auto-approve
         working-directory: terraform/stacks/security/github-oidc-prod
+
